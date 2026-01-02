@@ -1,0 +1,80 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(agent-mail:*)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PROJECT_DIR=\"$PWD\" uv run python hooks/session_start.py"
+          },
+          {
+            "type": "command",
+            "command": "PROJECT_DIR=\"$PWD\" uv run python hooks/multi_agent_guidance.py"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "agent-mail file_reservations soon \"$PWD\" --minutes 10 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PROJECT_DIR=\"$PWD\" uv run python hooks/check_inbox.py urgent"
+          },
+          {
+            "type": "command",
+            "command": "PROJECT_DIR=\"$PWD\" uv run python hooks/session_heartbeat.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(agent-mail send:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PROJECT_DIR=\"$PWD\" uv run python hooks/post_send.py"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(agent-mail reserve:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "agent-mail file_reservations list \"$PWD\" 2>/dev/null || true"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PROJECT_DIR=\"$PWD\" uv run python hooks/check_inbox.py summary"
+          }
+        ]
+      }
+    ]
+  }
+}

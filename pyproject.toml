@@ -1,0 +1,35 @@
+[project]
+name = "agent-mail-cli"
+version = "0.1.0"
+description = "CLI wrapper for mcp-agent-mail server - progressive disclosure for token efficiency"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "typer[all]>=0.12.0",
+    "httpx>=0.27.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+]
+
+[project.scripts]
+agent-mail = "agent_mail_cli.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_mail_cli"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/agent_mail_cli"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+markers = [
+    "unit: fast, hermetic tests",
+    "integration: tests that hit a running agent-mail server",
+]
